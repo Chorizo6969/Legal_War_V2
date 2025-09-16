@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,7 +8,7 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// Mouvement du Perso (ZQSD, cam, sprint et saut)
 /// </summary>
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float _speed;
@@ -22,10 +23,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("AnimationRef")]
     [SerializeField] private PlayerAnim _playerAnimRef;
 
+    [Header("Others")]
+    [SerializeField] private PlayerVisual _playerVisualRef;
+
     private Vector2 _inputVector;
     private Vector2 _lookVector;
     private Vector3 _velocity;
     private float _xRotation = 0f;
+
+    private void Start()
+    {
+        PlayerData playerData = LegalWarNetworkManager.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        _playerVisualRef.SetColorPlayer(LegalWarNetworkManager.Instance.GetPlayerColor(playerData.meshID));
+    }
 
     #region LinkToInputSystem
     private InputSystem_Politician _controls;
@@ -81,6 +91,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner)
+            return;
         HandleMovement();
         HandleLook();
     }

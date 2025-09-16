@@ -12,7 +12,7 @@ public class SetupLaws : MonoBehaviour
     {
         _validateButton.onClick.AddListener(() =>
         {
-            GameManager.Instance.StartGame();
+            SpawnPlayerManager.Instance.StartGame();
             LawsManager.Instance.PlayerLawsList.Add(_inputFieldTest.text);
             _panelLaws.Hide();
 
