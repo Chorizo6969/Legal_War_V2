@@ -58,6 +58,7 @@ public class LegalWarNetworkManager : NetworkBehaviour
         {
             clientID = clientId,
             meshID = GetFirstUnusedColorId(),
+            playerIndex = _playerDataNetworkList.Count
         });
     }
 

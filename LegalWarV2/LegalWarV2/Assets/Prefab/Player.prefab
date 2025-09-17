@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 7532564627598434833}
   - component: {fileID: 2195296281473218374}
   m_Layer: 0
-  m_Name: Points
+  m_Name: Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 4953356772071499222}
   - component: {fileID: 7818455552978433747}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: Scoring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1124,7 +1124,7 @@ GameObject:
   - component: {fileID: 8160942789975039407}
   - component: {fileID: 7781818286450410006}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: PartyName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1401,6 +1401,7 @@ GameObject:
   - component: {fileID: 226879123462979257}
   - component: {fileID: 280046658907919231}
   - component: {fileID: 4030919086377109778}
+  - component: {fileID: 7658049903581518890}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1496,6 +1497,7 @@ MonoBehaviour:
   _mouseSensitivity: 15
   _playerAnimRef: {fileID: 7702977000922358462}
   _playerVisualRef: {fileID: 3063846990907001370}
+  _canvasRef: {fileID: 6200419348322397760}
 --- !u!114 &7702977000922358462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1508,6 +1510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e70092d666e7025489ba13f19927b39f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   _animator: {fileID: 7411585340996459613}
 --- !u!114 &226879123462979257
 MonoBehaviour:
@@ -1585,6 +1588,34 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   _audioListener: {fileID: 1805451426304617713}
   _playerCamera: {fileID: 2804804005029655262}
+--- !u!114 &7658049903581518890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4936273313458767641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb9b34bc0d0d461429784573246b58bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  _allPartyColorsUISprites:
+  - {fileID: 21300000, guid: 553f15d3307726a49a6c943a10fb0b74, type: 3}
+  - {fileID: 21300000, guid: 65eeb84f2927a994da08b25da95ce34f, type: 3}
+  - {fileID: 21300000, guid: cb5869731ee15ad4585bb62be601f73b, type: 3}
+  - {fileID: 21300000, guid: dcc4c8833e401f64d98327833783d7fd, type: 3}
+  - {fileID: 21300000, guid: f38328137e1177e4098f7e35dca94421, type: 3}
+  _allPartyName:
+  - Rassemblement Nostalgique
+  - Republiquoi
+  - Ensable
+  - Parti Soporifique
+  - La Farce Insoumise
+  _partyColorsUIRef: {fileID: 7298124362401020364}
+  _partyName: {fileID: 7781818286450410006}
+  _partyScoringBackGroundRef: {fileID: 2195296281473218374}
 --- !u!1 &4986035635923064733
 GameObject:
   m_ObjectHideFlags: 0
@@ -1965,7 +1996,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &194275805197387090
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1998,8 +2029,8 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_Camera: {fileID: 2804804005029655262}
+  m_PlaneDistance: 5
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -2023,10 +2054,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

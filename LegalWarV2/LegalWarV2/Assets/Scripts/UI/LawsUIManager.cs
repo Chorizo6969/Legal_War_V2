@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.Collections;
 using UnityEngine;
 
 public class LawsUIManager : MonoBehaviour
@@ -12,5 +13,5 @@ public class LawsUIManager : MonoBehaviour
         Instance = this;
     }
 
-    public void UpdateLawsText(string NewText) => _lawsText.text = "Sujet choisi : " + NewText;
+    public void UpdateLawsText(FixedString128Bytes NewText) => _lawsText.text = "Sujet choisi : " + NewText.ToString();
 }

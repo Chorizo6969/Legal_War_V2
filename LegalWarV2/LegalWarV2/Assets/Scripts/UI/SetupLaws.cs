@@ -1,4 +1,6 @@
+using System;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,13 +14,19 @@ public class SetupLaws : MonoBehaviour
     {
         _validateButton.onClick.AddListener(() =>
         {
-            SpawnPlayerManager.Instance.StartGame();
-            LawsManager.Instance.PlayerLawsList.Add(_inputFieldTest.text);
+            int playerIndex = FindPlayerIndex();
+            SpawnPlayerManager.Instance.RequestStartGameServerRpc(playerIndex);
+
+            LawsManager.Instance.SubmitLawServerRpc(_inputFieldTest.text);
             _panelLaws.Hide();
-
-            SetupMainLawsPanel.Instance.HideWaitingScreen();
-
-            LawsManager.Instance.StartTirageLaws();
         });
+
+    }
+
+    private int FindPlayerIndex()
+    {
+        ulong localClientId = NetworkManager.Singleton.LocalClientId;
+        PlayerData data = LegalWarNetworkManager.Instance.GetPlayerDataFromClientId(localClientId);
+        return data.playerIndex;
     }
 }

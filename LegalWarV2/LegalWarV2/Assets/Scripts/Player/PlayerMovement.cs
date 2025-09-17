@@ -1,6 +1,4 @@
-using Cysharp.Threading.Tasks;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,6 +23,7 @@ public class PlayerMovement : NetworkBehaviour
 
     [Header("Others")]
     [SerializeField] private PlayerVisual _playerVisualRef;
+    [SerializeField] private GameObject _canvasRef;
 
     private Vector2 _inputVector;
     private Vector2 _lookVector;
@@ -35,6 +34,10 @@ public class PlayerMovement : NetworkBehaviour
     {
         PlayerData playerData = LegalWarNetworkManager.Instance.GetPlayerDataFromClientId(OwnerClientId);
         _playerVisualRef.SetColorPlayer(LegalWarNetworkManager.Instance.GetPlayerColor(playerData.meshID));
+
+        if (!IsOwner)
+            return;
+        _canvasRef.SetActive(true);
     }
 
     #region LinkToInputSystem
@@ -122,5 +125,32 @@ public class PlayerMovement : NetworkBehaviour
         _playerCamera.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
 
         transform.Rotate(Vector3.up * mouseX);
+    }
+
+
+    [ClientRpc]
+    public void TeleportClientRpc(Vector3 position, ClientRpcParams clientRpcParams = default)
+    {
+        // Ce code s'exécute sur le client ciblé
+        Debug.Log($"TeleportClientRpc reçu sur client {NetworkManager.Singleton.LocalClientId}: {position}");
+        var cc = GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+        transform.position = position;
+        if (cc != null) cc.enabled = true;
+    }
+
+    [ClientRpc]
+    public void EnableControlsClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsOwner) return;
+        EnableControls();
+        Debug.Log("EnableControlsClientRpc exécuté (owner)");
+    }
+
+    [ClientRpc]
+    public void DisableControlsClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsOwner) return;
+        DisableControls();
     }
 }

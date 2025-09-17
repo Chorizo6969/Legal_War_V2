@@ -1484,7 +1484,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.15419187, g: 0.25395888, b: 0.4245283, a: 1}
+  m_Color: {r: 0.15294118, g: 0.25490198, b: 0.42352942, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2474,6 +2474,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1055935987}
+  - component: {fileID: 1055935989}
   - component: {fileID: 1055935986}
   - component: {fileID: 1055935988}
   m_Layer: 0
@@ -2495,8 +2496,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e668cee03d0112845886b82e935a79b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerLawsList: []
-  _playerLawsUI: {fileID: 0}
+  ShowTopMostFoldoutHeaderGroup: 1
+  ChosenLawIndex:
+    m_InternalValue: -1
+  _playerLawsUI: {fileID: 592990532}
+  _loadingScreenUI: {fileID: 1937439401}
 --- !u!4 &1055935987
 Transform:
   m_ObjectHideFlags: 0
@@ -2525,6 +2529,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lawsText: {fileID: 1025980876}
+--- !u!114 &1055935989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055935985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2050295441
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &1173158829
 GameObject:
   m_ObjectHideFlags: 0
@@ -2582,6 +2611,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _playerPrefab: {fileID: 8407894492398178963, guid: 9450c785e2337d742935c21ae60d5a84, type: 3}
+  _playerLocationAfterChoiceLaws:
+  - {fileID: 238249412}
+  - {fileID: 2013465141}
+  - {fileID: 1448833232}
+  - {fileID: 1559090873}
+  - {fileID: 1932570322}
+  - {fileID: 331855415}
   _spawnPlayer:
   - {fileID: 1527737719}
   - {fileID: 1553728608}
@@ -2589,13 +2625,6 @@ MonoBehaviour:
   - {fileID: 495226603}
   - {fileID: 82225931}
   - {fileID: 1193751410}
-  _startGame:
-  - {fileID: 238249412}
-  - {fileID: 2013465141}
-  - {fileID: 1448833232}
-  - {fileID: 1559090873}
-  - {fileID: 1932570322}
-  - {fileID: 331855415}
 --- !u!4 &1173158832
 Transform:
   m_ObjectHideFlags: 0
@@ -3362,6 +3391,112 @@ Transform:
   m_Children: []
   m_Father: {fileID: 888658284}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1588834072
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1588834075}
+  - component: {fileID: 1588834073}
+  - component: {fileID: 1588834074}
+  m_Layer: 0
+  m_Name: ChangeUILawsPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1588834073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588834072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1498330523
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1588834074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588834072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a232ad610fcc5284eb1c7e912ed8c26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  _allPartyIdSprites:
+  - {fileID: 21300000, guid: 402033f40ce62ed4c9b7d30c3f267024, type: 3}
+  - {fileID: 21300000, guid: 0d6d57d729d3feb419df7efacce2020a, type: 3}
+  - {fileID: 21300000, guid: 894a3873643589448bb7ac221d4f22f9, type: 3}
+  - {fileID: 21300000, guid: 7c74fda875034b74aaefc85cd14d3265, type: 3}
+  - {fileID: 21300000, guid: 4f8ecdc5f7f5944479b182326f4e1e87, type: 3}
+  _partyIdRef: {fileID: 1298492758}
+  _allPartyBackgroundColor:
+  - {fileID: 21300000, guid: 7954c3fd0f8dc8a459939962e5db4ec0, type: 3}
+  - {fileID: 21300000, guid: d9570e22acb9a15419b58795d701c4d9, type: 3}
+  - {fileID: 21300000, guid: 62250b2794d4a3f44a520017eda014c3, type: 3}
+  - {fileID: 21300000, guid: b030d3c00bc80db4d9fdc2d46c932638, type: 3}
+  - {fileID: 21300000, guid: de19c2f47851f7746a90b7ace01981fe, type: 3}
+  _partyBackgroundColorRef: {fileID: 2083457293}
+  _allPartyName:
+  - Rassemblement Nostalgique
+  - Republiquoi
+  - Ensable
+  - Parti Soporifique
+  - La Farce Insoumise
+  _partyName: {fileID: 723173212}
+  _allpartyBorderColorPanel:
+  - {r: 0.15294118, g: 0.25490198, b: 0.42352942, a: 1}
+  - {r: 0.15294118, g: 0.42352942, b: 0.39215687, a: 1}
+  - {r: 0.42745098, g: 0.2901961, b: 0, a: 1}
+  - {r: 0.5019608, g: 0.3137255, b: 0.2509804, a: 1}
+  - {r: 0.42352942, g: 0.15686275, b: 0.15686275, a: 1}
+  _partyBorderColorPanel: {fileID: 636243857}
+  _allpartyColorPanel:
+  - {r: 0.22352941, g: 0.34509805, b: 0.5529412, a: 1}
+  - {r: 0.22352941, g: 0.5529412, b: 0.5529412, a: 1}
+  - {r: 0.78431374, g: 0.53333336, b: 0, a: 1}
+  - {r: 0.8352941, g: 0.47058824, b: 0.42352942, a: 1}
+  - {r: 0.5529412, g: 0.22352941, b: 0.22352941, a: 1}
+  _partyBackgroundColorPanel: {fileID: 436843808}
+--- !u!4 &1588834075
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588834072}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.4045181, y: 14.048165, z: -1.0472711}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1705593975
 GameObject:
   m_ObjectHideFlags: 0
@@ -3420,7 +3555,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7954c3fd0f8dc8a459939962e5db4ec0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d9570e22acb9a15419b58795d701c4d9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9670,3 +9805,4 @@ SceneRoots:
   - {fileID: 1055935987}
   - {fileID: 568715798}
   - {fileID: 1173158832}
+  - {fileID: 1588834075}

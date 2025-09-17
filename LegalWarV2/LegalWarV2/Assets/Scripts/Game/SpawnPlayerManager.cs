@@ -4,21 +4,25 @@ using UnityEngine;
 
 public class SpawnPlayerManager : NetworkBehaviour
 {
+    private Dictionary<ulong, GameObject> _players = new();
+
     [SerializeField] private Transform _playerPrefab;
-
+    [SerializeField] private List<Transform> _playerLocationAfterChoiceLaws;
     [SerializeField] private List<Transform> _spawnPlayer;
-    [SerializeField] private List<Transform> _startGame;
-
-    private List<GameObject> _playerList = new();
 
     public static SpawnPlayerManager Instance;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
 
-    public override void OnNetworkSpawn()
+    public override void OnNetworkSpawn() //Seul l'host peut voir ça
     {
         if (IsServer)
         {
@@ -26,33 +30,61 @@ public class SpawnPlayerManager : NetworkBehaviour
         }
     }
 
-    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, System.Collections.Generic.List<ulong> clientsCompleted, System.Collections.Generic.List<ulong> clientsTimedOut)
+    /// <summary>
+    /// On spawn les joueurs au 0 0
+    /// </summary>
+    /// <param name="sceneName"></param>
+    /// <param name="loadSceneMode"></param>
+    /// <param name="clientsCompleted"></param>
+    /// <param name="clientsTimedOut"></param>
+    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            ulong cliendId = NetworkManager.Singleton.ConnectedClientsIds[i];
-
             Transform playerTransform = Instantiate(_playerPrefab);
-            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(cliendId, true);
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
 
-            _playerList.Add(playerTransform.gameObject);
-
-            playerTransform.position = _spawnPlayer[i].position;
-            playerTransform.GetComponent<PlayerMovement>().DisableControls();
+            _players[clientId] = playerTransform.gameObject;
         }
+
+        SetupPlayersAtGameStart();
     }
 
-    public void StartGame()
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestStartGameServerRpc(int spawnIndex, ServerRpcParams rpcParams = default) //Comme le network transform est réecris je dois demander au client de se tp car il est le seul à pouvoir le faire !
     {
-        //for (int i = 0; i <  _playerList.Count; i++)
-        //{
-        //    CharacterController PlayerCharacterController = _playerList[i].GetComponent<CharacterController>();
+        ulong senderClientId = rpcParams.Receive.SenderClientId;
 
-        //    PlayerCharacterController.enabled = false;
-        //    _playerList[i].transform.position = _startGame[i].position;
-        //    PlayerCharacterController.enabled = true;
+        ClientRpcParams clientRpcParams = new ClientRpcParams  // Envoie un ClientRpc ciblé pour que le client se téléporte
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { senderClientId } }
+        };
 
-        //    _playerList[i].GetComponent<PlayerMovement>().EnableControls();
-        //}
+        _players[senderClientId].GetComponent<PlayerMovement>().TeleportClientRpc(
+            _playerLocationAfterChoiceLaws[spawnIndex].position,
+            clientRpcParams
+        );
+        _players[senderClientId].GetComponent<PlayerMovement>().EnableControlsClientRpc(clientRpcParams);
+    }
+
+
+    private void SetupPlayersAtGameStart()
+    {
+        foreach (KeyValuePair<ulong, GameObject> kvp in _players)
+        {
+            ulong clientId = kvp.Key;
+            GameObject player = kvp.Value;
+            int playerIndex = LegalWarNetworkManager.Instance.GetPlayerDataFromClientId(clientId).playerIndex;
+
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } }
+            };
+
+            player.GetComponent<PlayerMovement>().TeleportClientRpc(_spawnPlayer[playerIndex].position, clientRpcParams);
+            player.GetComponent<PlayerMovement>().DisableControlsClientRpc(clientRpcParams); // désactiver les inputs au début
+            player.GetComponent<PoliticsClass>().ChangePlayerColorsUIClientRpc(clientRpcParams);
+        }
     }
 }
