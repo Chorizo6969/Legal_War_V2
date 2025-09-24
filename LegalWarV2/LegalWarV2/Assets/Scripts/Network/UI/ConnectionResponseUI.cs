@@ -24,9 +24,12 @@ public class ConnectionResponseUI : MonoBehaviour
     {
         Show();
         _message.text = NetworkManager.Singleton.DisconnectReason;
-        if (_message.text == "")
+        if (string.IsNullOrEmpty(_message.text))
         {
-            _message.text = "Échec de la conexion...";
+            if (LegalWarNetworkManager.Instance.IncorectCode)
+                _message.text = "Code incorecte !";
+            else
+                _message.text = "Échec de la conexion...";
         }
     }
 

@@ -69,7 +69,7 @@ public class SpawnPlayerManager : NetworkBehaviour
     }
 
 
-    private void SetupPlayersAtGameStart()
+    private async void SetupPlayersAtGameStart()
     {
         foreach (KeyValuePair<ulong, GameObject> kvp in _players)
         {
@@ -86,5 +86,8 @@ public class SpawnPlayerManager : NetworkBehaviour
             player.GetComponent<PlayerMovement>().DisableControlsClientRpc(clientRpcParams); // désactiver les inputs au début
             player.GetComponent<PoliticsClass>().ChangePlayerColorsUIClientRpc(clientRpcParams);
         }
+
+        await VivoxManager.Instance.LeaveTestChannel();
+        await VivoxManager.Instance.JoinProximityChannel();
     }
 }

@@ -1,6 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,9 +20,17 @@ public class LegalWarNetworkManager : NetworkBehaviour
     public event EventHandler OnPlayerDataNetworkListChanged;
     public event EventHandler OnSucessJoinGame;
 
+
     [SerializeField] private List<Mesh> _playerMeshList;
+    [SerializeField] private TMP_InputField _code;
+    [SerializeField] private TextMeshProUGUI _codeSection;
 
     private NetworkList<PlayerData> _playerDataNetworkList;
+
+    private bool _clientDisconnectSubscribed = false;
+    private string _joinCodeInput;
+
+    public bool IncorectCode;
 
     private void Awake()
     {
@@ -32,12 +46,33 @@ public class LegalWarNetworkManager : NetworkBehaviour
         OnPlayerDataNetworkListChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void StartHost()
+    public async void StartHost()
     {
         NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
         NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Server_OnClientDisconnectCallback;
-        NetworkManager.Singleton.StartHost();
+        string joinCode = await StartHostWithRelay(_maxPlayerCount, "default");
+        Debug.Log($"Host started, join code: {joinCode}");
+    }
+
+    public async Task<string> StartHostWithRelay(int maxConnections, string connectionType)
+    {
+        await UnityServices.InitializeAsync();
+
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+
+        var allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+        var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+        _codeSection.text = "Code : " + joinCode;
+
+        var unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        unityTransport.SetRelayServerData(allocation.RelayServer.IpV4, (ushort)allocation.RelayServer.Port, allocation.AllocationIdBytes, allocation.Key, allocation.ConnectionData);
+
+        return NetworkManager.Singleton.StartHost() ? joinCode : null;
     }
 
     private void NetworkManager_Server_OnClientDisconnectCallback(ulong clientId)
@@ -77,16 +112,36 @@ public class LegalWarNetworkManager : NetworkBehaviour
             connectionApprovalResponse.Reason = "Le nombre maximum de joueur est atteint !";
             return;
         }
+
         connectionApprovalResponse.Approved = true;
     }
 
-    public void StartClient()
+    public async void StartClient()
     {
         OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
-        if (NetworkManager.Singleton.StartClient()) // Problème : je peux join si aucune game n'est en cours
+
+        if (!_clientDisconnectSubscribed)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
+            _clientDisconnectSubscribed = true;
+        }
+
+        _joinCodeInput = _code.text;
+
+        if (string.IsNullOrEmpty(_joinCodeInput) || !_relayCodeRegex.IsMatch(_joinCodeInput))
+        {
+            IncorectCode = true;
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
+        bool success = await StartClientWithRelay(_joinCodeInput, "default");
+        if (success)
             OnSucessJoinGame?.Invoke(this, EventArgs.Empty);
+        else
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
     }
+
 
     private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId)
     {
@@ -178,9 +233,41 @@ public class LegalWarNetworkManager : NetworkBehaviour
         return -1;
     }
 
-    public void KickPlayer(ulong clientId)
+    private static readonly System.Text.RegularExpressions.Regex _relayCodeRegex =
+        new System.Text.RegularExpressions.Regex("^[6789BCDFGHJKLMNPQRTWbcdfghjklmnpqrtw]{6,12}$"); // Regex extraite de la doc officielle / erreur Relay
+
+    public async Task<bool> StartClientWithRelay(string joinCode, string connectionType) //Tiré de la doc officielle de Relay, Choppe les possibles erreurs lors de la saisie du code
     {
-        NetworkManager.Singleton.DisconnectClient(clientId);
-        NetworkManager_Server_OnClientDisconnectCallback(clientId);
+        await UnityServices.InitializeAsync();
+
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+
+        try
+        {
+            var allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            var unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            unityTransport.SetRelayServerData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData,
+                allocation.HostConnectionData
+            );
+
+            _codeSection.text = "Code : " + joinCode;
+
+            return NetworkManager.Singleton.StartClient();
+        }
+        catch
+        {
+            IncorectCode = true;
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+            return false;
+        }
     }
 }
