@@ -69,7 +69,7 @@ public class SpawnPlayerManager : NetworkBehaviour
     }
 
 
-    private async void SetupPlayersAtGameStart()
+    private void SetupPlayersAtGameStart()
     {
         foreach (KeyValuePair<ulong, GameObject> kvp in _players)
         {
@@ -86,8 +86,25 @@ public class SpawnPlayerManager : NetworkBehaviour
             player.GetComponent<PlayerMovement>().DisableControlsClientRpc(clientRpcParams); // désactiver les inputs au début
             player.GetComponent<PoliticsClass>().ChangePlayerColorsUIClientRpc(clientRpcParams);
         }
-
-        await VivoxManager.Instance.LeaveTestChannel();
-        await VivoxManager.Instance.JoinProximityChannel();
     }
+
+    private void OnEnable()
+    {
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnClientSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnClientSceneLoaded;
+    }
+
+    private async void OnClientSceneLoaded(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        if (sceneName == "LegalWar")
+        {
+            await VivoxManager.Instance.LeaveTestChannel();
+            await VivoxManager.Instance.JoinProximityChannel();
+        }
+    }
+
 }

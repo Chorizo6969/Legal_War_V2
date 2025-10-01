@@ -56,8 +56,8 @@ public class VivoxManager : MonoBehaviour
         string channelName = "InGameChannel";
 
         Channel3DProperties props = new Channel3DProperties(
-            audibleDistance: 32, //On entends ma voix jusqu'a 32m
-            conversationalDistance: 1, //Voix pleine jusqu'a 1m
+            audibleDistance: 12, //On entends ma voix jusqu'a 32m
+            conversationalDistance: 2, //Voix pleine jusqu'a 1m
             audioFadeIntensityByDistanceaudio: 1f, //Fade intensity = 1
             audioFadeModel: AudioFadeModel.InverseByDistance
         );
